@@ -71,9 +71,9 @@ function Particle(x, y, c, m){
         fill(51)
         ellipse(this.x, this.y, this.m * (10 + innerRadius), this.m * (10 + innerRadius));
         if(this.charge < 0){
-            fill(map(-this.charge, 150, 255, 1, 3), 100, 100)
+            fill(map(-this.charge, 1, 3, 180, 255), 180, 180)
         } else {
-            fill(100, 100, map(this.charge, 150, 255, 1, 3))
+            fill(180, 180, map(this.charge, 1, 1, 180, 255))
         }
         ellipse(this.x, this.y, this.m * 10, this.m * 10);
     }
@@ -108,8 +108,25 @@ lineStep = 1
 
 particles = []
 
+pause = false;
 
+document.oncontextmenu = function(e){e.preventDefault()}
 
+function mousePressed(){
+    spawn = new Particle(mouseX, mouseY, mouseButton == LEFT ? -(1 + random() * 2) : 1 + random() * 2, 1)
+}
+
+function mouseReleased(){
+    particles.push(spawn)
+}
+
+function keyTyped(){
+    switch(key){
+        case "c": particles = []; break;
+        case " ": pause = !pause; break;
+    }
+    return false;
+}
 
 function setup(){
     noStroke()
@@ -117,9 +134,9 @@ function setup(){
 
     for(i = 0; i < n; i++){
         if(random() < 0.5){
-            particles.push(new Particle(random()*width / 3 + width / 3, random()*height/ 3 + height / 3, 1 + random() * 2, 1 + random() * 1))
+            particles.push(new Particle(random()*width / 3 + width / 3, random()*height/ 3 + height / 3, 1 + random() * 2, 1))
         } else {
-            particles.push(new Particle(random()*width / 3 + width / 3, random()*height/ 3 + height / 3, -(1 + random() * 2), 1 + random() * 1))
+            particles.push(new Particle(random()*width / 3 + width / 3, random()*height/ 3 + height / 3, -(1 + random() * 2), 1))
         }
     }
 }
@@ -138,10 +155,21 @@ function draw(){
         p.show()
     });
 
+    if(!pause){
+        stroke(0, 255, 0)
+        particles.forEach(p => {
+            p.update()
+        });
+    }
     
-    stroke(0, 255, 0)
-    particles.forEach(p => {
-        p.update()
-    });
+    if(mouseIsPressed){
+        stroke(255)
+        line(spawn.x, spawn.y, mouseX, mouseY)
+        noStroke()
+        fill(180)
+        ellipse(spawn.x, spawn.y, spawn.m * (10 + innerRadius), spawn.m * (10 + innerRadius))
+        spawn.vx = 0.03 * (spawn.x - mouseX)
+        spawn.vy = 0.03 * (spawn.y - mouseY)
+    }
     
 }
